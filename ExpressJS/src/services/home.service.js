@@ -18,6 +18,9 @@ const productInclude = [
 
 const getPromotions = async (limit = 5) => {
   return Promotion.findAll({
+     where: {
+      isActive: true
+    },
     limit,
     order: [['createdAt', 'DESC']],
     attributes: ['id', 'title', 'discountPercent', 'image', 'createdAt'],

@@ -2,7 +2,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-
+import { fileURLToPath } from "url";
+import path from "path";
 import viewEngine from "./config/viewEngine.js";
 import initWebRoutes from "./route/web.js";
 import connectDB from "./config/configdb.js";
@@ -11,6 +12,8 @@ import connectDB from "./config/configdb.js";
 dotenv.config();
 
 const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // connect database
 connectDB();
@@ -51,3 +54,5 @@ app.listen(port, () => {
         `Backend Nodejs is running on port: ${port}`
     );
 });
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

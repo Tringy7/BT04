@@ -6,4 +6,4 @@ let configViewEngine = (app) => {
     app.set("views", "./src/views") //thư mục chứa views
 }
 
-module.exports = configViewEngine; //xuất hàm ra
+export default configViewEngine; //xuất hàm ra

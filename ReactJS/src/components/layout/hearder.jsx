@@ -8,23 +8,23 @@ const Header = () => {
 
     const navigate = useNavigate();
     const { auth, dispatch } = useContext(AuthContext);
-    const [current, setCurrent] = useState('mail');
-    console.log(">>> check auth: ", auth);
+    const [current, setCurrent] = useState('home');
+
     const items = [
         {
-            label: <Link to="/">Home Page</Link>,
+            label: <Link to="/home">Home Page</Link>,
             key: 'home',
             icon: <HomeOutlined />,
         },
         ...(auth.isAuthenticated ? [{
-            label: <Link to="/user">Users</Link>,
+            label: <Link to="/user/profile">Users</Link>,
             key: 'user',
             icon: <UsergroupAddOutlined />,
         }] : []),
 
         {
             label: `Welcome ${auth?.user?.email ?? ""}`,
-            key: 'SubMenu',
+            key: 'settings',
             icon: <SettingOutlined />,
             children: [
                 ...(auth.isAuthenticated ? [{
@@ -32,7 +32,7 @@ const Header = () => {
                         localStorage.removeItem("access_token");
                         setCurrent("home");
                         dispatch({ type: 'LOGOUT' });
-                        navigate("/");
+                        navigate("/login");
                     }}>Đăng xuất</span>,
                     key: 'logout',
                 }] : [
@@ -44,9 +44,8 @@ const Header = () => {
             ],
         },
     ];
-    const [current, setCurrent] = useState('mail');
+
     const onClick = (e) => {
-        console.log('click ', e);
         setCurrent(e.key);
     };
     return <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={items} />;

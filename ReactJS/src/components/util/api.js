@@ -90,6 +90,11 @@ const forgotPasswordApi = (email) => {
     return axios.post(URL_API, data);
 };
 
+const getHomePageApi = () => {
+    const URL_API = "/api/home";
+    return axios.get(URL_API);
+};
+
 const resetPasswordApi = (email, otp, tempToken, newPassword, confirmPassword) => {
     const URL_API = "/api/auth/reset-password";
     const data = {
@@ -110,6 +115,13 @@ const resendForgotOtpApi = (email) => {
     return axios.post(URL_API, data);
 };
 
+const getImageUrl = (imageUrl) => {
+    if (!imageUrl) return '';
+    if (imageUrl.startsWith('http')) return imageUrl;
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
+    return `${backendUrl}${imageUrl}`;
+};
+
 export {
     createUserApi,
     loginApi,
@@ -118,6 +130,7 @@ export {
     registerApi,
     verifyRegisterOtpApi,
     resendRegisterOtpApi,
+    getHomePageApi,
     getUserProfileApi,
     updateUserProfileApi,
     updateAdminProfileApi,
@@ -125,4 +138,5 @@ export {
     forgotPasswordApi,
     resetPasswordApi,
     resendForgotOtpApi,
+    getImageUrl,
 };
