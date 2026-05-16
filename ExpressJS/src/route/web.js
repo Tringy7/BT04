@@ -13,6 +13,7 @@ import {
 
 import authRoutes from './auth.routes.js';
 import homeRoutes from './home.routes.js';
+import productRoutes from './product.routes.js';
 
 let router = express.Router();
 
@@ -38,9 +39,10 @@ let initWebRoutes = (app) => {
         authController.resendRegistrationOtp
     );
 
-    // mount API routes from auth.routes and home.routes
+    // mount API routes from auth.routes, home.routes and product.routes
     app.use('/', authRoutes);
     app.use('/', homeRoutes);
+    app.use('/', productRoutes);
 
     return app.use('/', router);
 };

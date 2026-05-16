@@ -6,6 +6,7 @@ import UserProfile from "./components/pages/user-profile.jsx";
 import UserEditProfile from "./components/pages/user-edit-profile.jsx";
 import AdminProfile from "./components/pages/admin-profile.jsx";
 import AdminEditProfile from "./components/pages/admin-edit-profile.jsx";
+import ProductDetail from "./components/pages/product-detail.jsx";
 import Header from "./components/layout/hearder.jsx";
 import { Routes, Route } from 'react-router-dom';
 
@@ -19,6 +20,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/product/:id" element={<ProductDetail />} />
         
         {/* User Routes */}
         <Route path="/user/profile" element={<UserProfile />} />

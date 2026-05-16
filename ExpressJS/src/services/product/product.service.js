@@ -68,6 +68,60 @@ const getHomePageData = async () => {
   };
 };
 
+const getProductDetail = async (productId) => {
+  return Product.findByPk(productId, {
+    attributes: [
+      'id',
+      'name',
+      'price',
+      'thumbnail',
+      'stock',
+      'sold',
+      'categoryId',
+      'brandId',
+      'description',
+      'createdAt',
+      'updatedAt'
+    ],
+    include: productInclude
+  });
+};
+
+const getSimilarProducts = async (categoryId, currentProductId, limit = 8) => {
+  const where = {
+    id: {
+      [db.Sequelize.Op.ne]: currentProductId
+    }
+  };
+
+  if (categoryId !== null && categoryId !== undefined) {
+    where.categoryId = categoryId;
+  }
+
+  return Product.findAll({
+    where,
+    limit,
+    order: [['sold', 'DESC']],
+    attributes: ['id', 'name', 'price', 'thumbnail', 'stock', 'sold', 'categoryId', 'brandId'],
+    include: productInclude
+  });
+};
+
+const getProductsByCategory = async (categoryId, limit = 20) => {
+  return Product.findAll({
+    where: {
+      categoryId
+    },
+    limit,
+    order: [['createdAt', 'DESC']],
+    attributes: ['id', 'name', 'price', 'thumbnail', 'stock', 'sold', 'categoryId', 'brandId'],
+    include: productInclude
+  });
+};
+
 export default {
-  getHomePageData
+  getHomePageData,
+  getProductDetail,
+  getSimilarProducts,
+  getProductsByCategory
 };

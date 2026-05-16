@@ -95,6 +95,11 @@ const getHomePageApi = () => {
     return axios.get(URL_API);
 };
 
+const getProductDetailApi = (id) => {
+    const URL_API = `/api/products/${id}`;
+    return axios.get(URL_API);
+};
+
 const resetPasswordApi = (email, otp, tempToken, newPassword, confirmPassword) => {
     const URL_API = "/api/auth/reset-password";
     const data = {
@@ -131,6 +136,7 @@ export {
     verifyRegisterOtpApi,
     resendRegisterOtpApi,
     getHomePageApi,
+    getProductDetailApi,
     getUserProfileApi,
     updateUserProfileApi,
     updateAdminProfileApi,

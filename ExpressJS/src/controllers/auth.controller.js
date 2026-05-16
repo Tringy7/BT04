@@ -1,15 +1,15 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import db from "../models/index.js";
-import { sendOtpEmail } from '../services/email.service.js';
+import { sendOtpEmail } from '../services/auth/email.service.js';
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt.js";
 import {
   generateOTP,
   getOTPExpiry,
   isOTPExpired,
   verifyOTPCode,
-} from "../services/otpService.js";
-import { sendPasswordResetEmail } from "../services/mailService.js";
+} from "../services/auth/otpService.js";
+import { sendPasswordResetEmail } from "../services/auth/mailService.js";
 
 const { User, RefreshToken, ResetOtp } = db;
 

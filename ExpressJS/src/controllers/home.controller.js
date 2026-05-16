@@ -1,4 +1,4 @@
-import homeService from '../services/home.service.js';
+import homeService from '../services/home/home.service.js';
 
 const getHomePage = async (req, res) => {
   try {

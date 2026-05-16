@@ -7,22 +7,28 @@ import {
     Divider,
     Empty,
     Image,
+    Input,
     message,
     Row,
+    Select,
     Skeleton,
     Tag,
     Typography
 } from 'antd';
 
 import {
+    FilterOutlined,
     ShoppingOutlined,
     StarFilled,
     FireOutlined
 } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 import { getHomePageApi, getImageUrl } from '../util/api';
 
 const { Title, Paragraph, Text } = Typography;
+const { Search } = Input;
+const { Option } = Select;
 
 const HomePage = () => {
     const [homeData, setHomeData] = useState({
@@ -32,6 +38,9 @@ const HomePage = () => {
     });
 
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [sortOrder, setSortOrder] = useState('default');
+    const navigate = useNavigate();
 
     useEffect(() => {
         const loadHomeData = async () => {
@@ -72,7 +81,7 @@ const HomePage = () => {
     };
 
     const handleProductClick = (product) => {
-        message.info(`Bạn đã chọn: ${product.name}`);
+        navigate(`/product/${product.id}`);
     };
 
     // PROMOTION CARD
@@ -313,6 +322,26 @@ const HomePage = () => {
         bestSellingProducts
     } = homeData;
 
+    // FILTER & SORT LOGIC
+    const filterAndSortProducts = (products) => {
+        if (!products) return [];
+        let result = [...products];
+        
+        if (searchTerm) {
+            result = result.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
+        }
+        
+        if (sortOrder === 'price-asc') {
+            result.sort((a, b) => a.price - b.price);
+        } else if (sortOrder === 'price-desc') {
+            result.sort((a, b) => b.price - a.price);
+        }
+        return result;
+    };
+
+    const filteredNewest = filterAndSortProducts(newestProducts);
+    const filteredBestSelling = filterAndSortProducts(bestSellingProducts);
+
     return (
         <div
             style={{
@@ -531,6 +560,36 @@ const HomePage = () => {
                     </Row>
                 )}
 
+                {/* TOOLBAR: SEARCH & FILTER */}
+                <Row justify="space-between" align="middle" style={{ marginBottom: 24, marginTop: 40 }}>
+                    <Col xs={24} md={12} style={{ marginBottom: 16 }}>
+                        <Title level={3} style={{ margin: 0 }}>
+                            Khám phá sản phẩm
+                        </Title>
+                    </Col>
+                    <Col xs={24} md={12}>
+                        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                            <Search
+                                placeholder="Tìm kiếm sản phẩm..."
+                                allowClear
+                                onSearch={(value) => setSearchTerm(value)}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                style={{ width: 250 }}
+                            />
+                            <Select
+                                defaultValue="default"
+                                style={{ width: 180 }}
+                                onChange={(value) => setSortOrder(value)}
+                                suffixIcon={<FilterOutlined />}
+                            >
+                                <Option value="default">Sắp xếp mặc định</Option>
+                                <Option value="price-asc">Giá: Thấp đến Cao</Option>
+                                <Option value="price-desc">Giá: Cao xuống Thấp</Option>
+                            </Select>
+                        </div>
+                    </Col>
+                </Row>
+
                 {/* NEW PRODUCTS */}
                 <Divider orientation="left">
                     ✨ Sản phẩm mới nhất
@@ -540,8 +599,8 @@ const HomePage = () => {
                     gutter={[24, 24]}
                     style={{ marginBottom: 32 }}
                 >
-                    {newestProducts.length ? (
-                        newestProducts.map((product) => (
+                    {filteredNewest.length ? (
+                        filteredNewest.map((product) => (
                             <Col
                                 xs={24}
                                 sm={12}
@@ -565,8 +624,8 @@ const HomePage = () => {
                 </Divider>
 
                 <Row gutter={[24, 24]}>
-                    {bestSellingProducts.length ? (
-                        bestSellingProducts.map((product) => (
+                    {filteredBestSelling.length ? (
+                        filteredBestSelling.map((product) => (
                             <Col
                                 xs={24}
                                 sm={12}
