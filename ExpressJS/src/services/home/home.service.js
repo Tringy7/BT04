@@ -16,11 +16,14 @@ const productInclude = [
   }
 ];
 
-const getPromotions = async (limit = 5) => {
+const getPromotions = async (options = {}) => {
+  const { page = 1, limit = 10 } = options;
+  const offset = (page - 1) * limit;
   return Promotion.findAll({
      where: {
       isActive: true
     },
+    offset,
     limit,
     order: [['createdAt', 'DESC']],
     attributes: ['id', 'title', 'discountPercent', 'image', 'createdAt'],
@@ -36,38 +39,60 @@ const getPromotions = async (limit = 5) => {
   });
 };
 
-const getNewestProducts = async (limit = 10) => {
-  return Product.findAll({
-    limit,
-    order: [['createdAt', 'DESC']],
-    attributes: ['id', 'name', 'price', 'thumbnail', 'stock', 'sold', 'categoryId', 'brandId', 'createdAt'],
-    include: productInclude
-  });
-};
-
-const getBestSellingProducts = async (limit = 10) => {
-  return Product.findAll({
+const getBestSellingProducts = async (options = {}) => {
+  const { page = 1, limit = 10 } = options;
+  const offset = (page - 1) * limit;
+  return Product.findAndCountAll({
+    offset,
     limit,
     order: [['sold', 'DESC']],
     attributes: ['id', 'name', 'price', 'thumbnail', 'stock', 'sold', 'categoryId', 'brandId'],
-    include: productInclude
+    include: productInclude,
+    distinct: true
+  });
+};
+
+const getAllProducts = async (options = {}) => {
+  const { page = 1, limit = 12, search = '', sort = 'default' } = options;
+  const offset = (page - 1) * limit;
+
+  let order = [['createdAt', 'DESC']];
+  if (sort === 'price-asc') order = [['price', 'ASC']];
+  if (sort === 'price-desc') order = [['price', 'DESC']];
+
+  let whereClause = {};
+  if (search) {
+    whereClause.name = {
+      [db.Sequelize.Op.like]: `%${search}%`
+    };
+  }
+
+  return Product.findAndCountAll({
+    where: whereClause,
+    offset,
+    limit,
+    order,
+    attributes: ['id', 'name', 'price', 'thumbnail', 'stock', 'sold', 'categoryId', 'brandId', 'createdAt'],
+    include: productInclude,
+    distinct: true
   });
 };
 
 const getHomePageData = async () => {
-  const [promotions, newestProducts, bestSellingProducts] = await Promise.all([
-    getPromotions(5),
-    getNewestProducts(10),
-    getBestSellingProducts(10)
+  const [promotions, bestSellingProducts] = await Promise.all([
+    getPromotions({ limit: 5 }),
+    getBestSellingProducts({ page: 1, limit: 10 })
   ]);
 
   return {
     promotions,
-    newestProducts,
     bestSellingProducts
   };
 };
 
 export default {
-  getHomePageData
+  getHomePageData,
+  getPromotions,
+  getBestSellingProducts,
+  getAllProducts
 };

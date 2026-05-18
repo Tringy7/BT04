@@ -9,6 +9,7 @@ import {
     Image,
     Input,
     message,
+    Pagination,
     Row,
     Select,
     Skeleton,
@@ -24,20 +25,28 @@ import {
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
-import { getHomePageApi, getImageUrl } from '../util/api';
+import {
+    getHomePageApi,
+    getImageUrl,
+    getBestSellingProductsApi
+} from '../util/api';
 
 const { Title, Paragraph, Text } = Typography;
 const { Search } = Input;
 const { Option } = Select;
 
 const HomePage = () => {
-    const [homeData, setHomeData] = useState({
-        promotions: [],
-        newestProducts: [],
-        bestSellingProducts: []
-    });
+    const [promotions, setPromotions] = useState([]);
+    const [bestSellingProducts, setBestSellingProducts] = useState({ rows: [], count: 0 });
 
     const [loading, setLoading] = useState(true);
+    const [productsLoading, setProductsLoading] = useState({
+        bestSelling: false
+    });
+
+    const [bestSellingPage, setBestSellingPage] = useState(1);
+    const PRODUCT_PAGE_SIZE = 10;
+
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOrder, setSortOrder] = useState('default');
     const navigate = useNavigate();
@@ -48,19 +57,13 @@ const HomePage = () => {
 
             try {
                 const res = await getHomePageApi();
+                const data = res?.data || res;
 
-                if (res?.data) {
-                    setHomeData(res.data);
-                } else if (
-                    res?.promotions ||
-                    res?.newestProducts ||
-                    res?.bestSellingProducts
-                ) {
-                    setHomeData(res);
+                if (data) {
+                    setPromotions(data.promotions || []);
+                    setBestSellingProducts(data.bestSellingProducts || { rows: [], count: 0 });
                 } else {
-                    message.error(
-                        res?.message || 'Không tải được dữ liệu trang chủ'
-                    );
+                    message.error(res?.message || 'Không tải được dữ liệu trang chủ');
                 }
             } catch (error) {
                 message.error('Lỗi khi tải dữ liệu trang chủ');
@@ -71,6 +74,24 @@ const HomePage = () => {
 
         loadHomeData();
     }, []);
+
+    const handleBestSellingPageChange = async (page) => {
+        setProductsLoading((prev) => ({ ...prev, bestSelling: true }));
+        window.scrollTo({ top: document.getElementById('bestselling-products-divider')?.offsetTop - 80, behavior: 'smooth' });
+        try {
+            // Giả sử getBestSellingProductsApi được định nghĩa trong util/api.js
+            const res = await getBestSellingProductsApi(page, PRODUCT_PAGE_SIZE);
+            const data = res?.data || res;
+            if (data?.rows) {
+                setBestSellingProducts(data);
+                setBestSellingPage(page);
+            }
+        } catch (error) {
+            message.error('Lỗi khi tải trang sản phẩm bán chạy');
+        } finally {
+            setProductsLoading((prev) => ({ ...prev, bestSelling: false }));
+        }
+    };
 
     // FORMAT PRICE VND
     const formatPrice = (price) => {
@@ -316,12 +337,6 @@ const HomePage = () => {
         );
     };
 
-    const {
-        promotions,
-        newestProducts,
-        bestSellingProducts
-    } = homeData;
-
     // FILTER & SORT LOGIC
     const filterAndSortProducts = (products) => {
         if (!products) return [];
@@ -339,8 +354,8 @@ const HomePage = () => {
         return result;
     };
 
-    const filteredNewest = filterAndSortProducts(newestProducts);
-    const filteredBestSelling = filterAndSortProducts(bestSellingProducts);
+    // Bỏ qua lọc cục bộ vì giờ đã có trang All Products xử lý riêng
+    const filteredBestSelling = bestSellingProducts.rows;
 
     return (
         <div
@@ -561,128 +576,81 @@ const HomePage = () => {
                 )}
 
                 {/* TOOLBAR: SEARCH & FILTER */}
-                <Row justify="space-between" align="middle" style={{ marginBottom: 24, marginTop: 40 }}>
+                <Row
+                    justify="space-between"
+                    align="middle"
+                    style={{ marginBottom: 24, marginTop: 40 }}
+                >
                     <Col xs={24} md={12} style={{ marginBottom: 16 }}>
                         <Title level={3} style={{ margin: 0 }}>
                             Khám phá sản phẩm
                         </Title>
                     </Col>
                     <Col xs={24} md={12}>
-                        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                        <div
+                            style={{
+                                display: 'flex',
+                                gap: 16,
+                                flexWrap: 'wrap',
+                                justifyContent: 'flex-end'
+                            }}
+                        >
                             <Search
                                 placeholder="Tìm kiếm sản phẩm..."
                                 allowClear
-                                onSearch={(value) => setSearchTerm(value)}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                style={{ width: 250 }}
+                                onSearch={(value) => {
+                                    if(value) navigate(`/products?search=${value}`);
+                                }}
+                                style={{ width: 300 }}
                             />
-                            <Select
-                                defaultValue="default"
-                                style={{ width: 180 }}
-                                onChange={(value) => setSortOrder(value)}
-                                suffixIcon={<FilterOutlined />}
+                            <Button 
+                                type="primary" 
+                                size="large" 
+                                onClick={() => navigate('/products')}
                             >
-                                <Option value="default">Sắp xếp mặc định</Option>
-                                <Option value="price-asc">Giá: Thấp đến Cao</Option>
-                                <Option value="price-desc">Giá: Cao xuống Thấp</Option>
-                            </Select>
+                                Tất cả sản phẩm
+                            </Button>
                         </div>
                     </Col>
                 </Row>
 
-                {/* NEW PRODUCTS */}
-                <Divider orientation="left">
-                    ✨ Sản phẩm mới nhất
-                </Divider>
-
-                <Row
-                    gutter={[24, 24]}
-                    style={{ marginBottom: 32 }}
-                >
-                    {filteredNewest.length ? (
-                        filteredNewest.map((product) => (
-                            <Col
-                                xs={24}
-                                sm={12}
-                                md={8}
-                                lg={6}
-                                key={`new-${product.id}`}
-                            >
-                                {renderProductCard(product)}
-                            </Col>
-                        ))
-                    ) : (
-                        <Col span={24}>
-                            <Empty description="Không có sản phẩm mới" />
-                        </Col>
-                    )}
-                </Row>
-
                 {/* BEST SELLING */}
-                <Divider orientation="left">
-                    🚀 Bán chạy nhất
+                <Divider orientation="left" id="bestselling-products-divider">
+                    Bán chạy nhất
                 </Divider>
 
-                <Row gutter={[24, 24]}>
-                    {filteredBestSelling.length ? (
-                        filteredBestSelling.map((product) => (
-                            <Col
-                                xs={24}
-                                sm={12}
-                                md={8}
-                                lg={6}
-                                key={`best-${product.id}`}
-                            >
-                                {renderProductCard(product)}
+                <Skeleton active loading={productsLoading.bestSelling}>
+                    <Row gutter={[24, 24]}>
+                        {filteredBestSelling.length > 0 ? (
+                            filteredBestSelling.map((product) => (
+                                <Col
+                                    xs={24}
+                                    sm={12}
+                                    md={8}
+                                    lg={6}
+                                    key={`best-${product.id}`}
+                                >
+                                    {renderProductCard(product)}
+                                </Col>
+                            ))
+                        ) : (
+                            <Col span={24}>
+                                <Empty description="Không tìm thấy sản phẩm nào" />
                             </Col>
-                        ))
-                    ) : (
-                        <Col span={24}>
-                            <Empty description="Không có sản phẩm bán chạy" />
-                        </Col>
+                        )}
+                    </Row>
+                    {bestSellingProducts.count > PRODUCT_PAGE_SIZE && (
+                        <Row justify="center" style={{ marginTop: 32 }}>
+                            <Pagination
+                                current={bestSellingPage}
+                                total={bestSellingProducts.count}
+                                pageSize={PRODUCT_PAGE_SIZE}
+                                onChange={handleBestSellingPageChange}
+                                showSizeChanger={false}
+                            />
+                        </Row>
                     )}
-                </Row>
-
-                {/* FOOT TAGS */}
-                <div
-                    style={{
-                        marginTop: 60,
-                        textAlign: 'center'
-                    }}
-                >
-                    <Tag
-                        icon={<FireOutlined />}
-                        color="error"
-                        style={{
-                            padding: '8px 16px',
-                            borderRadius: 999
-                        }}
-                    >
-                        Hot
-                    </Tag>
-
-                    <Tag
-                        icon={<StarFilled />}
-                        color="warning"
-                        style={{
-                            padding: '8px 16px',
-                            borderRadius: 999
-                        }}
-                    >
-                        Yêu thích
-                    </Tag>
-
-                    <Tag
-                        icon={<ShoppingOutlined />}
-                        color="success"
-                        style={{
-                            padding: '8px 16px',
-                            borderRadius: 999
-                        }}
-                    >
-                        Săn sale
-                    </Tag>
-                </div>
+                </Skeleton>
             </Skeleton>
         </div>
     );

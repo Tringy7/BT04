@@ -8,6 +8,8 @@ import AdminProfile from "./components/pages/admin-profile.jsx";
 import AdminEditProfile from "./components/pages/admin-edit-profile.jsx";
 import ProductDetail from "./components/pages/product-detail.jsx";
 import Header from "./components/layout/hearder.jsx";
+import Products from "./components/pages/products.jsx";
+
 import { Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -21,6 +23,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/products" element={<Products />} />
         
         {/* User Routes */}
         <Route path="/user/profile" element={<UserProfile />} />
