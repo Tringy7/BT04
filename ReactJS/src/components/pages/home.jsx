@@ -25,11 +25,9 @@ import {
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
-import {
-    getHomePageApi,
-    getImageUrl,
-    getBestSellingProductsApi
-} from '../util/api';
+import { getHomePageApi } from '../util/api/home.api';
+import { getBestSellingProductsApi } from '../util/api/product.api';
+import { getImageUrl } from '../util/helpers';
 
 const { Title, Paragraph, Text } = Typography;
 const { Search } = Input;

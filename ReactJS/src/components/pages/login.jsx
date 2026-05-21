@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Button, Col, Divider, Form, Input, notification, Row } from 'antd';
-import { loginApi } from '../util/api';
+import { loginApi } from '../util/api/auth.api';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/auth.context';
 import { ArrowLeftOutlined } from '@ant-design/icons';

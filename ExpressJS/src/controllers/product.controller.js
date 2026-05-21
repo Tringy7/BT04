@@ -1,5 +1,5 @@
 import productService from '../services/product/product.service.js';
-
+  
 const getProductDetail = async (req, res) => {
   try {
     const productId = Number(req.params.id);
@@ -12,13 +12,10 @@ const getProductDetail = async (req, res) => {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    const similarProducts = await productService.getSimilarProducts(product.categoryId, product.id, 8);
-
     return res.json({
       message: 'Product detail loaded successfully',
       data: {
-        product,
-        similarProducts
+        product
       }
     });
   } catch (error) {

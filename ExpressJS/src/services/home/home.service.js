@@ -19,6 +19,12 @@ const productInclude = [
 const getPromotions = async (options = {}) => {
   const { page = 1, limit = 10 } = options;
   const offset = (page - 1) * limit;
+  console.log(db);
+console.log('Promotion:', Promotion);
+console.log('Product:', Product);
+console.log('Brand:', Brand);
+console.log('ProductImage:', ProductImage);
+
   return Promotion.findAll({
      where: {
       isActive: true

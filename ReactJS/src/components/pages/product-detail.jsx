@@ -8,7 +8,9 @@ import {
     HomeOutlined,
     ArrowLeftOutlined
 } from '@ant-design/icons';
-import { getImageUrl, getProductDetailApi } from '../util/api';
+import { getProductDetailApi } from '../util/api/product.api';
+import { getImageUrl } from '../util/helpers';
+import { addToCart } from '../util/api/cart.api';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -74,8 +76,17 @@ const ProductDetail = () => {
         }).format(price);
     };
 
-    const handleAddToCart = () => {
-        message.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng`);
+    const handleAddToCart = async () => {
+        try {
+            const res = await addToCart({ productId: product.id, quantity });
+            if (res && (res.success || res.data?.success)) {
+                message.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng`);
+            } else {
+                message.error('Thêm vào giỏ hàng thất bại');
+            }
+        } catch (error) {
+            message.error('Lỗi khi thêm vào giỏ hàng. Vui lòng đăng nhập!');
+        }
     };
 
     const handleBuyNow = () => {

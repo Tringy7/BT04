@@ -16,6 +16,11 @@ const productInclude = [
   }
 ];
 
+const getProductById = async (options = {}) => {
+  const productId = options;
+  return Product.findByPk(productId);
+}
+
 const getPromotions = async (limit = 5) => {
   return Promotion.findAll({
      where: {
@@ -54,20 +59,6 @@ const getBestSellingProducts = async (limit = 10) => {
   });
 };
 
-const getHomePageData = async () => {
-  const [promotions, newestProducts, bestSellingProducts] = await Promise.all([
-    getPromotions(5),
-    getNewestProducts(10),
-    getBestSellingProducts(10)
-  ]);
-
-  return {
-    promotions,
-    newestProducts,
-    bestSellingProducts
-  };
-};
-
 const getProductDetail = async (productId) => {
   return Product.findByPk(productId, {
     attributes: [
@@ -87,26 +78,6 @@ const getProductDetail = async (productId) => {
   });
 };
 
-const getSimilarProducts = async (categoryId, currentProductId, limit = 8) => {
-  const where = {
-    id: {
-      [db.Sequelize.Op.ne]: currentProductId
-    }
-  };
-
-  if (categoryId !== null && categoryId !== undefined) {
-    where.categoryId = categoryId;
-  }
-
-  return Product.findAll({
-    where,
-    limit,
-    order: [['sold', 'DESC']],
-    attributes: ['id', 'name', 'price', 'thumbnail', 'stock', 'sold', 'categoryId', 'brandId'],
-    include: productInclude
-  });
-};
-
 const getProductsByCategory = async (categoryId, limit = 20) => {
   return Product.findAll({
     where: {
@@ -120,8 +91,7 @@ const getProductsByCategory = async (categoryId, limit = 20) => {
 };
 
 export default {
-  getHomePageData,
   getProductDetail,
-  getSimilarProducts,
-  getProductsByCategory
+  getProductsByCategory,
+  getProductById
 };

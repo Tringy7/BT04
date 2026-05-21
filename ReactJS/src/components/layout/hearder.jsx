@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { UsergroupAddOutlined, HomeOutlined, SettingOutlined, ShoppingOutlined } from '@ant-design/icons';
+import { UserOutlined, HomeOutlined, SettingOutlined, ShoppingOutlined, ShoppingCartOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/auth.context';
@@ -21,16 +21,22 @@ const Header = () => {
             key: 'products',
             icon: <ShoppingOutlined />,
         },
-        ...(auth.isAuthenticated ? [{
-            label: <Link to="/user/profile">Users</Link>,
+        {
+            label: <Link to="/cart">Cart</Link>,
+            key: 'cart',
+            icon: <ShoppingCartOutlined />,
+        },
+        {
+            label: <Link to="/user/profile">Profile</Link>,
             key: 'user',
-            icon: <UsergroupAddOutlined />,
-        }] : []),
+            icon: <UserOutlined />,
+        },
 
         {
             label: `Setting ${auth?.user?.email ?? ""}`,
             key: 'settings',
             icon: <SettingOutlined />,
+            style: { marginLeft: 'auto' },
             children: [
                 ...(auth.isAuthenticated ? [{
                     label: <span onClick={() => {
@@ -40,6 +46,7 @@ const Header = () => {
                         navigate("/login");
                     }}>Đăng xuất</span>,
                     key: 'logout',
+                    icon: <LogoutOutlined />,
                 }] : [
                     {
                         label: <Link to="/login">Đăng nhập</Link>,

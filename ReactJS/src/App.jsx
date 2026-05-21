@@ -9,6 +9,7 @@ import AdminEditProfile from "./components/pages/admin-edit-profile.jsx";
 import ProductDetail from "./components/pages/product-detail.jsx";
 import Header from "./components/layout/hearder.jsx";
 import Products from "./components/pages/products.jsx";
+import CartPage from "./components/pages/cart.jsx";
 
 import { Routes, Route } from 'react-router-dom';
 
@@ -24,6 +25,9 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/products" element={<Products />} />
+        <Route path="/cart" element={<CartPage />} />
+
+        
         
         {/* User Routes */}
         <Route path="/user/profile" element={<UserProfile />} />

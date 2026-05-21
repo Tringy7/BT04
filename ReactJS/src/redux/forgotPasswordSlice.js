@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { forgotPasswordApi, resetPasswordApi, resendForgotOtpApi } from '../components/util/api';
+import { forgotPasswordApi, resetPasswordApi, resendForgotOtpApi } from '../components/util/api/auth.api';
 
 export const requestForgotPassword = createAsyncThunk(
     'forgotPassword/requestForgotPassword',

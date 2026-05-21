@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Card, Button, Row, Col, Descriptions, Avatar, Spin, Divider, Table, Space, Popconfirm, message } from 'antd';
 import { EditOutlined, UserOutlined, DeleteOutlined } from '@ant-design/icons';
 import { fetchUserProfile } from '../../redux/profileSlice';
-import { getAllUsersApi } from '../util/api';
+import { getAllUsersApi } from '../util/api/user.api';
 import '../../components/styles/global.css';
 
 const AdminProfile = () => {

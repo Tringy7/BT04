@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, Col, Form, Input, notification, Row, Spin } from 'antd';
 import { ArrowLeftOutlined, MailOutlined, LockOutlined, UserOutlined, PhoneOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
-import { registerApi } from '../util/api';
+import { registerApi } from '../util/api/auth.api';
 
 const RegisterStep1 = ({ onNext, email: initialEmail = '' }) => {
     const [form] = Form.useForm();

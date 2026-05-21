@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Row, Col, Card, Typography, Button, Empty, Input, Select, Pagination, Breadcrumb, Image, Tag, Skeleton, message } from 'antd';
 import { HomeOutlined, FilterOutlined } from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { getAllProductsStoreApi, getImageUrl } from '../util/api';
+import { getAllProductsStoreApi } from '../util/api/product.api';
+import { getImageUrl } from '../util/helpers';
 
 const { Title, Text } = Typography;
 const { Search } = Input;

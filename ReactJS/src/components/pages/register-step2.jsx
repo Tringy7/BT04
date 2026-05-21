@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Button, Col, Form, Input, notification, Row, Spin } from 'antd';
 import { ArrowLeftOutlined, MailOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
-import { verifyRegisterOtpApi, resendRegisterOtpApi } from '../util/api';
+import {
+  verifyRegisterOtpApi,
+  resendRegisterOtpApi
+} from '../util/api/auth.api';
 
 const RegisterStep2 = ({ email, onBack }) => {
     const [form] = Form.useForm();

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { updateUserProfileApi, updateAdminProfileApi, getUserProfileApi } from '../components/util/api';
+import { updateUserProfileApi, updateAdminProfileApi, getUserProfileApi } from '../components/util/api/user.api';
 
 // Async thunks
 export const fetchUserProfile = createAsyncThunk(

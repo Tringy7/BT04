@@ -1,39 +1,54 @@
 import axios from "axios";
 
-// Set config defaults when creating the instance
 const instance = axios.create({
     baseURL: import.meta.env.VITE_BACKEND_URL,
     withCredentials: true,
 });
 
-// Add a request interceptor
-instance.interceptors.request.use(
-    function (config) {
-        const token = localStorage.getItem("access_token");
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    function (error) {
-        return Promise.reject(error);
-    }
-);
-
-// Add a response interceptor
 instance.interceptors.response.use(
+
     function (response) {
-        if (response && response.data) return response.data;
+
+        if (response && response.data) {
+            return response.data;
+        }
+
         return response;
     },
-    function (error) {
-        // 🔒 Nếu API trả 401 -> redirect login
-        if (error?.response?.status === 401) {
-            localStorage.removeItem("access_token");
-            window.location.href = '/login';
+
+    async function (error) {
+
+        const originalRequest = error.config;
+
+        if (
+            error?.response?.status === 401 &&
+            !originalRequest._retry
+        ) {
+
+            originalRequest._retry = true;
+
+            try {
+
+                // refresh bằng cookie
+                await axios.post(
+                    `${import.meta.env.VITE_BACKEND_URL}/api/auth/refresh`,
+                    {},
+                    {
+                        withCredentials: true
+                    }
+                );
+
+                // gọi lại request cũ
+                return instance(originalRequest);
+
+            } catch (refreshError) {
+
+                window.location.href = "/login";
+
+                return Promise.reject(refreshError);
+            }
         }
-        
-        if (error?.response?.data) return error?.response?.data;
+
         return Promise.reject(error);
     }
 );

@@ -2,7 +2,7 @@
   "development": {
     "username": "root",
     "password": "171005",
-    "database": "node_fulltask",
+    "database": "uteshop",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
