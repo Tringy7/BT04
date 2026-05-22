@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { UserOutlined, HomeOutlined, SettingOutlined, ShoppingOutlined, ShoppingCartOutlined, LogoutOutlined } from '@ant-design/icons';
+import { UserOutlined, HomeOutlined, SettingOutlined, ShoppingOutlined, ShoppingCartOutlined, LogoutOutlined, HistoryOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/auth.context';
@@ -25,6 +25,11 @@ const Header = () => {
             label: <Link to="/cart">Cart</Link>,
             key: 'cart',
             icon: <ShoppingCartOutlined />,
+        },
+        {
+            label: <Link to="/history">Lịch sử đơn hàng</Link>,
+            key: 'history',
+            icon: <HistoryOutlined />,
         },
         {
             label: <Link to="/user/profile">Profile</Link>,

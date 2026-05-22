@@ -13,6 +13,7 @@ const CartPage = () => {
     const [cartItems, setCartItems] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
         fetchCartData();
@@ -104,12 +105,13 @@ const CartPage = () => {
     const discount = subtotal > 50000000 ? 500000 : 0;
     const total = subtotal + shipping - discount;
 
-    const handleCheckout = () => {
+    const handleCheckoutClick = async () => {
         if (selectedRowKeys.length === 0) {
             return message.warning('Vui lòng chọn ít nhất 1 sản phẩm để thanh toán!');
         }
-        message.success('Đang chuyển đến trang thanh toán...');
-        // navigate('/checkout');
+        
+        const selectedItemsData = cartItems.filter(item => selectedRowKeys.includes(item.id));
+        navigate('/checkout/new', { state: { selectedItems: selectedItemsData } });
     };
 
     if (loading) {
@@ -299,7 +301,7 @@ const CartPage = () => {
                                 type="primary" 
                                 size="large" 
                                 block 
-                                onClick={handleCheckout}
+                                onClick={handleCheckoutClick}
                                 style={{ 
                                     height: 50, 
                                     borderRadius: 999, 

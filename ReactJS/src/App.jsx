@@ -10,6 +10,8 @@ import ProductDetail from "./components/pages/product-detail.jsx";
 import Header from "./components/layout/hearder.jsx";
 import Products from "./components/pages/products.jsx";
 import CartPage from "./components/pages/cart.jsx";
+import CheckoutPage from "./components/pages/checkout.jsx";
+import OrderHistoryPage from "./components/pages/orderHistory.jsx";
 
 import { Routes, Route } from 'react-router-dom';
 
@@ -26,6 +28,8 @@ function App() {
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/products" element={<Products />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout/:orderId" element={<CheckoutPage />} />
+        <Route path="/history" element={<OrderHistoryPage />} />
 
         
         
