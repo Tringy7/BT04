@@ -13,12 +13,16 @@ import CartPage from "./components/pages/cart.jsx";
 import CheckoutPage from "./components/pages/checkout.jsx";
 import OrderHistoryPage from "./components/pages/orderHistory.jsx";
 
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 
 function App() {
+  const location = useLocation();
+  const authRoutes = ['/login', '/register', '/forgot-password'];
+  const showHeader = !authRoutes.includes(location.pathname);
+
   return (
     <>
-      <Header />
+      {showHeader && <Header />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
@@ -46,4 +50,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
