@@ -8,6 +8,7 @@ import AdminProfile from "./components/pages/admin-profile.jsx";
 import AdminEditProfile from "./components/pages/admin-edit-profile.jsx";
 import ProductDetail from "./components/pages/product-detail.jsx";
 import Header from "./components/layout/hearder.jsx";
+import Footer from "./components/layout/footer.jsx";
 import Products from "./components/pages/products.jsx";
 import CartPage from "./components/pages/cart.jsx";
 import CheckoutPage from "./components/pages/checkout.jsx";
@@ -18,11 +19,11 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 function App() {
   const location = useLocation();
   const authRoutes = ['/login', '/register', '/forgot-password'];
-  const showHeader = !authRoutes.includes(location.pathname);
+  const showHeaderFooter = !authRoutes.includes(location.pathname);
 
   return (
     <>
-      {showHeader && <Header />}
+      {showHeaderFooter && <Header />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
@@ -46,6 +47,7 @@ function App() {
         <Route path="/admin/edit-profile" element={<AdminEditProfile />} />
         <Route path="/admin/edit-profile/:userId" element={<AdminEditProfile />} />
       </Routes>
+      {showHeaderFooter && <Footer />}
     </>
   );
 }

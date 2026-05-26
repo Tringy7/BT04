@@ -17,8 +17,6 @@ const LoginPage = () => {
         const res = await loginApi(email, password);
 
         if (res && res.token) {
-            localStorage.setItem("access_token", res.token);
-
             const role = res?.role || res?.user?.role || '';
             const redirectPath = role.toLowerCase() === 'admin'
                 ? '/admin/profile'
@@ -152,7 +150,7 @@ const LoginPage = () => {
                             className="login-btn"
                             style={styles.button}
                         >
-                            Sign In
+                            Login
                         </Button>
                     </Form.Item>
                 </Form>

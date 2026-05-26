@@ -4,24 +4,24 @@ import {
     Card,
     Carousel,
     Col,
-    Divider,
     Empty,
     Image,
     Input,
     message,
     Pagination,
     Row,
-    Select,
     Skeleton,
     Tag,
-    Typography
+    Typography,
+    Space
 } from 'antd';
 
 import {
-    FilterOutlined,
-    ShoppingOutlined,
-    StarFilled,
-    FireOutlined
+    ArrowRightOutlined,
+    SearchOutlined,
+    EyeOutlined,
+    HeartOutlined,
+    FireFilled
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
@@ -31,7 +31,6 @@ import { getImageUrl } from '../util/helpers';
 
 const { Title, Paragraph, Text } = Typography;
 const { Search } = Input;
-const { Option } = Select;
 
 const HomePage = () => {
     const [promotions, setPromotions] = useState([]);
@@ -44,15 +43,11 @@ const HomePage = () => {
 
     const [bestSellingPage, setBestSellingPage] = useState(1);
     const PRODUCT_PAGE_SIZE = 10;
-
-    const [searchTerm, setSearchTerm] = useState('');
-    const [sortOrder, setSortOrder] = useState('default');
     const navigate = useNavigate();
 
     useEffect(() => {
         const loadHomeData = async () => {
             setLoading(true);
-
             try {
                 const res = await getHomePageApi();
                 const data = res?.data || res;
@@ -75,9 +70,8 @@ const HomePage = () => {
 
     const handleBestSellingPageChange = async (page) => {
         setProductsLoading((prev) => ({ ...prev, bestSelling: true }));
-        window.scrollTo({ top: document.getElementById('bestselling-products-divider')?.offsetTop - 80, behavior: 'smooth' });
+        window.scrollTo({ top: document.getElementById('bestselling-section')?.offsetTop - 100, behavior: 'smooth' });
         try {
-            // Giả sử getBestSellingProductsApi được định nghĩa trong util/api.js
             const res = await getBestSellingProductsApi(page, PRODUCT_PAGE_SIZE);
             const data = res?.data || res;
             if (data?.rows) {
@@ -91,7 +85,6 @@ const HomePage = () => {
         }
     };
 
-    // FORMAT PRICE VND
     const formatPrice = (price) => {
         return new Intl.NumberFormat('vi-VN', {
             style: 'currency',
@@ -99,556 +92,612 @@ const HomePage = () => {
         }).format(price);
     };
 
-    const handleProductClick = (product) => {
-        navigate(`/product/${product.id}`);
-    };
-
-    // PROMOTION CARD
     const renderPromotionCard = (promotion) => {
-        const productImage =
-            promotion?.products?.[0]?.images?.[0]?.imageUrl;
-
-        const displayImage = getImageUrl(
-            promotion.image || productImage
-        );
+        const productImage = promotion?.products?.[0]?.images?.[0]?.imageUrl;
+        const displayImage = getImageUrl(promotion.image || productImage);
 
         return (
-            <div
-                key={promotion.id}
-                style={{
-                    width: '100%',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    padding: '10px 0'
-                }}
-            >
+            <div key={promotion.id} className="promo-slide-wrapper">
                 <Card
                     bordered={false}
-                    hoverable
-                    style={{
-                        width: '100%',
-                        maxWidth: 980,
-                        borderRadius: 24,
-                        overflow: 'hidden',
-                        background: '#fff',
-                        boxShadow: '0 12px 35px rgba(0,0,0,0.08)'
-                    }}
-                    bodyStyle={{
-                        padding: 0
-                    }}
+                    className="promo-card"
+                    bodyStyle={{ padding: 0 }}
                 >
-                    <div
-                        style={{
-                            position: 'relative',
-                            width: '100%',
-                            height: 340,
-                            overflow: 'hidden',
-                            background: '#f5f5f5'
-                        }}
-                    >
-                        <Image
-                            preview={false}
-                            fallback="https://via.placeholder.com/1200x420?text=Promotion"
-                            src={displayImage}
-                            alt={promotion.title}
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover'
-                            }}
-                        />
+                    <Row align="middle" style={{ height: '100%' }}>
+                        <Col xs={24} md={12} className="promo-content-col">
+                            <div className="promo-content-inner">
+                                <div className="promo-badge">
+                                    SALE {promotion.discountPercent}%
+                                </div>
 
-                        {/* OVERLAY */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                inset: 0,
-                                background:
-                                    'linear-gradient(to right, rgba(0,0,0,0.72), rgba(0,0,0,0.15))'
-                            }}
-                        />
+                                <Title level={2} className="promo-title">
+                                    {promotion.title}
+                                </Title>
 
-                        {/* CONTENT */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                left: 36,
-                                bottom: 36,
-                                zIndex: 2,
-                                color: '#fff',
-                                maxWidth: 500
-                            }}
-                        >
-                            <Tag
-                                color="volcano"
-                                style={{
-                                    fontWeight: 700,
-                                    padding: '6px 16px',
-                                    borderRadius: 999,
-                                    fontSize: 14
-                                }}
-                            >
-                                Giảm {promotion.discountPercent}%
-                            </Tag>
+                                <Paragraph className="promo-desc">
+                                    {promotion.products?.length
+                                        ? `Áp dụng cho ${promotion.products.length} sản phẩm cao cấp`
+                                        : 'Ưu đãi đặc quyền dành riêng cho bạn'}
+                                </Paragraph>
 
-                            <Title
-                                level={2}
-                                style={{
-                                    color: '#fff',
-                                    marginTop: 18,
-                                    marginBottom: 12,
-                                    fontSize: 34,
-                                    lineHeight: 1.2
-                                }}
-                            >
-                                {promotion.title}
-                            </Title>
-
-                            <Paragraph
-                                style={{
-                                    color: 'rgba(255,255,255,0.92)',
-                                    fontSize: 15,
-                                    marginBottom: 20
-                                }}
-                            >
-                                {promotion.products?.length
-                                    ? `Áp dụng cho ${promotion.products.length} sản phẩm`
-                                    : 'Ưu đãi hấp dẫn cho sản phẩm mới'}
-                            </Paragraph>
-
-                            <Button
-                                type="primary"
-                                size="large"
-                                icon={<ShoppingOutlined />}
-                                style={{
-                                    borderRadius: 999,
-                                    height: 44,
-                                    paddingInline: 24,
-                                    fontWeight: 600
-                                }}
-                            >
-                                Mua ngay
-                            </Button>
-                        </div>
-                    </div>
+                                <Button
+                                    type="primary"
+                                    shape="round"
+                                    size="large"
+                                    className="promo-btn"
+                                    onClick={() => navigate('/products')}
+                                >
+                                    Khám phá ngay
+                                </Button>
+                            </div>
+                        </Col>
+                        <Col xs={24} md={12} style={{ height: '100%' }}>
+                            <div className="promo-image-container">
+                                <Image
+                                    preview={false}
+                                    fallback="https://via.placeholder.com/800x600?text=Promotion"
+                                    src={displayImage}
+                                    alt={promotion.title}
+                                    className="promo-image"
+                                />
+                                <div className="promo-image-glow" />
+                            </div>
+                        </Col>
+                    </Row>
                 </Card>
             </div>
         );
     };
 
-    // PRODUCT CARD
     const renderProductCard = (product) => {
-        const imageUrl =
-            product?.images?.[0]?.imageUrl || product.thumbnail;
-
+        const imageUrl = product?.images?.[0]?.imageUrl || product.thumbnail;
         const displayImage = getImageUrl(imageUrl);
 
         return (
             <Card
                 key={product.id}
-                className="clickable-product-card"
-                onClick={() => handleProductClick(product)}
+                className="minimal-product-card"
+                onClick={() => navigate(`/product/${product.id}`)}
                 bordered={false}
-                hoverable
-                style={{
-                    borderRadius: 22,
-                    overflow: 'hidden',
-                    boxShadow: '0 6px 22px rgba(0,0,0,0.06)',
-                    transition: 'all 0.25s ease',
-                    cursor: 'pointer',
-                    height: '100%'
-                }}
-                bodyStyle={{
-                    padding: 18
-                }}
-                cover={
-                    <div
-                        style={{
-                            height: 220,
-                            overflow: 'hidden',
-                            background: '#f5f5f5'
-                        }}
-                    >
-                        <Image
-                            preview={false}
-                            fallback="https://via.placeholder.com/420x280?text=Product"
-                            src={displayImage}
-                            alt={product.name}
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover'
-                            }}
-                        />
-                    </div>
-                }
+                bodyStyle={{ padding: '0' }}
             >
-                <Title
-                    level={5}
-                    ellipsis={{ rows: 2 }}
-                    style={{
-                        minHeight: 48,
-                        marginBottom: 8
-                    }}
-                >
-                    {product.name}
-                </Title>
+                <div className="product-image-area">
+                    <Image
+                        preview={false}
+                        fallback="https://via.placeholder.com/420x280?text=Product"
+                        src={displayImage}
+                        alt={product.name}
+                        className="product-image"
+                    />
+                    <div className="product-actions">
+                        <Button shape="circle" icon={<HeartOutlined />} className="action-btn" onClick={(e) => { e.stopPropagation(); }} />
+                        <Button shape="circle" icon={<EyeOutlined />} className="action-btn" onClick={(e) => { e.stopPropagation(); navigate(`/product/${product.id}`); }} />
+                    </div>
+                </div>
 
-                <Text type="secondary">
-                    {product.brand?.name || 'Thương hiệu'} ·{' '}
-                    {product.stock} trong kho
-                </Text>
-
-                <div
-                    style={{
-                        marginTop: 16,
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                    }}
-                >
-                    <Text
-                        strong
-                        style={{
-                            fontSize: 20,
-                            color: '#1677ff'
-                        }}
-                    >
-                        {formatPrice(product.price)}
+                <div className="product-info">
+                    <Text className="product-brand">
+                        {product.brand?.name || 'PREMIUM'}
                     </Text>
 
-                    <Tag
-                        color={
-                            product.sold > 20
-                                ? 'success'
-                                : 'blue'
-                        }
-                        style={{
-                            borderRadius: 999,
-                            paddingInline: 12
-                        }}
-                    >
-                        {product.sold} đã bán
-                    </Tag>
+                    <Title level={5} ellipsis={{ rows: 2 }} className="product-name">
+                        {product.name}
+                    </Title>
+
+                    <div className="product-price-row">
+                        <Text strong className="product-price">
+                            {formatPrice(product.price)}
+                        </Text>
+                        <Text className="product-stock">
+                            Kho: {product.stock}
+                        </Text>
+                    </div>
                 </div>
             </Card>
         );
     };
 
-    // FILTER & SORT LOGIC
-    const filterAndSortProducts = (products) => {
-        if (!products) return [];
-        let result = [...products];
-        
-        if (searchTerm) {
-            result = result.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
-        }
-        
-        if (sortOrder === 'price-asc') {
-            result.sort((a, b) => a.price - b.price);
-        } else if (sortOrder === 'price-desc') {
-            result.sort((a, b) => b.price - a.price);
-        }
-        return result;
-    };
-
-    // Bỏ qua lọc cục bộ vì giờ đã có trang All Products xử lý riêng
     const filteredBestSelling = bestSellingProducts.rows;
 
     return (
-        <div
-            style={{
-                padding: '28px 24px 70px',
-                maxWidth: 1440,
-                margin: '0 auto'
-            }}
-        >
-            {/* CUSTOM CAROUSEL STYLE */}
+        <div className="page-wrapper">
             <style>
                 {`
-                    /* ===== CAROUSEL DOTS ===== */
-
-                    .custom-carousel .slick-dots {
-                        bottom: -14px;
+                    :root {
+                        --bg-main: #f5f5f3;
+                        --text-dark: #111;
+                        --text-gray: #777;
+                        --text-light: #888;
+                        --brand-blue: #1677ff;
+                        --brand-purple: #4f46e5;
                     }
 
-                    /* item wrapper */
-                    .custom-carousel .slick-dots li {
-                        width: 52px;
-                        margin: 0 6px;
+                    body {
+                        background-color: var(--bg-main);
+                        font-family: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                     }
 
-                    /* default bar */
-                    .custom-carousel .slick-dots li button {
-                        width: 52px !important;
-                        height: 8px !important;
-                        padding: 0 !important;
+                    .page-wrapper {
+                        max-width: 1280px;
+                        margin: 0 auto;
+                        padding: 0 32px;
+                        padding-bottom: 120px;
+                    }
+
+                    @media (max-width: 992px) {
+                        .page-wrapper { padding: 0 20px; }
+                    }
+                    @media (max-width: 576px) {
+                        .page-wrapper { padding: 0 14px; }
+                    }
+
+                    /* HERO SECTION */
+                    .hero-container {
+                        margin-top: 28px;
+                        background: #efefef;
+                        border-radius: 28px;
+                        padding: 56px;
+                        overflow: hidden;
+                    }
+
+                    @media (max-width: 768px) {
+                        .hero-container {
+                            padding: 32px 24px;
+                            border-radius: 20px;
+                        }
+                    }
+
+                    .hero-badge {
+                        background: #e0e7ff;
+                        color: #4338ca;
+                        padding: 6px 16px;
                         border-radius: 999px;
-                        background: #111111 !important;
-                        opacity: 0.25;
+                        font-size: 13px;
+                        font-weight: 600;
+                        display: inline-block;
+                        margin-bottom: 24px;
+                        border: none;
+                    }
+
+                    .hero-title {
+                        font-size: 72px !important;
+                        font-weight: 900 !important;
+                        line-height: 1 !important;
+                        letter-spacing: -3px;
+                        color: var(--text-dark) !important;
+                        margin-bottom: 24px !important;
+                    }
+
+                    @media (max-width: 992px) {
+                        .hero-title { font-size: 54px !important; letter-spacing: -2px; }
+                    }
+                    @media (max-width: 576px) {
+                        .hero-title { font-size: 38px !important; letter-spacing: -1px; }
+                    }
+
+                    .hero-desc {
+                        color: var(--text-gray);
+                        font-size: 16px;
+                        line-height: 1.8;
+                        max-width: 400px;
+                        margin-bottom: 40px;
+                    }
+
+                    .btn-primary {
+                        background: var(--brand-purple);
+                        height: 46px;
+                        border-radius: 999px;
+                        padding: 0 32px;
+                        font-weight: 500;
+                        border: none;
+                    }
+
+                    .btn-secondary {
+                        background: #fff;
+                        height: 46px;
+                        border-radius: 999px;
+                        padding: 0 32px;
+                        font-weight: 500;
+                        border: 1px solid rgba(0,0,0,0.1);
+                        color: var(--text-dark);
+                    }
+
+                    .hero-image-wrapper {
+                        position: relative;
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+
+                    .hero-image {
+                        border-radius: 20px;
+                        object-fit: cover;
+                        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                        animation: float 6s ease-in-out infinite;
+                    }
+
+                    @keyframes float {
+                        0% { transform: translateY(0px); }
+                        50% { transform: translateY(-10px); }
+                        100% { transform: translateY(0px); }
+                    }
+
+                    /* SECTION HEADERS */
+                    .section-title {
+                        font-size: 24px !important;
+                        font-weight: 700 !important;
+                        color: var(--text-dark) !important;
+                        margin: 0 !important;
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                    }
+                    
+                    .section-icon {
+                        color: #f97316;
+                        font-size: 20px;
+                    }
+
+                    /* PROMOTION SECTION */
+                    .promo-section {
+                        margin-top: 80px;
+                    }
+
+                    .promo-slide-wrapper {
+                        padding: 24px 0 40px;
+                    }
+
+                    .promo-card {
+                        background: linear-gradient(135deg, #111827 0%, #1e3a8a 100%);
+                        border-radius: 22px;
+                        overflow: hidden;
+                        height: 280px;
+                    }
+
+                    .promo-content-col {
+                        padding: 40px 48px;
+                        display: flex;
+                        align-items: center;
+                    }
+                    
+                    @media (max-width: 768px) {
+                        .promo-card { height: auto; }
+                        .promo-content-col { padding: 32px; text-align: center; }
+                    }
+
+                    .promo-badge {
+                        background: #ef4444;
+                        color: #fff;
+                        padding: 4px 12px;
+                        border-radius: 6px;
+                        font-size: 12px;
+                        font-weight: 700;
+                        display: inline-block;
+                        margin-bottom: 16px;
+                    }
+
+                    .promo-title {
+                        color: #fff !important;
+                        font-size: 32px !important;
+                        font-weight: 700 !important;
+                        margin-bottom: 12px !important;
+                        line-height: 1.2 !important;
+                    }
+
+                    .promo-desc {
+                        color: rgba(255,255,255,0.7) !important;
+                        font-size: 15px !important;
+                        margin-bottom: 24px !important;
+                    }
+
+                    .promo-btn {
+                        background: var(--brand-purple);
+                        border: none;
+                        font-weight: 600;
+                    }
+
+                    .promo-image-container {
+                        position: relative;
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-end;
+                        padding: 0 40px;
+                    }
+                    
+                    @media (max-width: 768px) {
+                         .promo-image-container { display: none; }
+                    }
+
+                    .promo-image {
+                        max-height: 220px;
+                        object-fit: contain;
+                        position: relative;
+                        z-index: 2;
+                        transform: perspective(1000px) rotateY(-10deg);
+                    }
+
+                    .promo-image-glow {
+                        position: absolute;
+                        width: 200px;
+                        height: 200px;
+                        background: rgba(96, 165, 250, 0.4);
+                        filter: blur(50px);
+                        border-radius: 50%;
+                        z-index: 1;
+                        right: 10%;
+                    }
+
+                    /* Minimal Carousel Dots */
+                    .ant-carousel .slick-dots li {
+                        width: 8px;
+                        margin: 0 4px;
+                    }
+                    .ant-carousel .slick-dots li button {
+                        width: 8px !important;
+                        height: 8px !important;
+                        border-radius: 50%;
+                        background: #d1d5db !important;
+                        opacity: 1;
+                    }
+                    .ant-carousel .slick-dots li.slick-active button {
+                        background: var(--text-dark) !important;
+                    }
+
+                    /* TOOLBAR */
+                    .toolbar-section {
+                        margin-top: 80px;
+                        margin-bottom: 32px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+
+                    .toolbar-search .ant-input-wrapper {
+                        background: #fff;
+                        border-radius: 8px;
+                        border: 1px solid rgba(0,0,0,0.08);
+                        overflow: hidden;
+                    }
+                    .toolbar-search .ant-input {
+                        border: none;
+                        height: 38px;
+                        padding-left: 16px;
+                        font-size: 14px;
+                    }
+                    .toolbar-search .ant-input:focus {
+                        box-shadow: none;
+                    }
+                    .toolbar-search .ant-btn {
+                        border: none;
+                        height: 38px;
+                        background: transparent;
+                        color: var(--text-light);
+                    }
+
+                    .btn-view-all {
+                        background: #1e293b;
+                        color: #fff;
+                        border-radius: 999px;
+                        height: 38px;
+                        padding: 0 20px;
+                        border: none;
+                        font-weight: 500;
+                        font-size: 13px;
+                    }
+
+                    /* PRODUCT CARD */
+                    .minimal-product-card {
+                        background: #fff;
+                        border-radius: 18px;
+                        padding: 16px;
+                        border: 1px solid rgba(0,0,0,0.04);
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+                        transition: all 0.3s ease;
+                        cursor: pointer;
+                        height: 100%;
+                    }
+
+                    .minimal-product-card:hover {
+                        transform: translateY(-6px);
+                        box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+                    }
+
+                    .product-image-area {
+                        background: #f3f4f6;
+                        border-radius: 14px;
+                        height: 180px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        position: relative;
+                        padding: 24px;
+                        margin-bottom: 16px;
+                        overflow: hidden;
+                    }
+
+                    .product-image {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: contain;
+                    }
+
+                    .product-actions {
+                        position: absolute;
+                        bottom: 12px;
+                        display: flex;
+                        gap: 8px;
+                        opacity: 0;
+                        transform: translateY(10px);
                         transition: all 0.3s ease;
                     }
 
-                    /* active bar */
-                    .custom-carousel .slick-dots li.slick-active button {
-                        background: #ff4d4f !important;
+                    .minimal-product-card:hover .product-actions {
                         opacity: 1;
-                        transform: scaleX(1.08);
-                        box-shadow: 0 0 10px rgba(255, 77, 79, 0.45);
+                        transform: translateY(0);
                     }
 
-                    /* remove default antd dots */
-                    .custom-carousel .slick-dots li button::before {
-                        display: none;
+                    .action-btn {
+                        width: 32px;
+                        height: 32px;
+                        border: none;
+                        background: rgba(255,255,255,0.9);
+                        backdrop-filter: blur(4px);
+                        color: var(--text-dark);
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                    }
+                    .action-btn:hover {
+                        background: #fff;
+                        color: var(--brand-blue);
                     }
 
-                    /* spacing */
-                    .custom-carousel .slick-slide {
-                        padding-bottom: 28px;
+                    .product-info {
+                        display: flex;
+                        flex-direction: column;
                     }
 
-                    .clickable-product-card {
-                        transition: transform 0.2s ease, box-shadow 0.2s ease;
+                    .product-brand {
+                        font-size: 11px;
+                        text-transform: uppercase;
+                        color: var(--text-light);
+                        letter-spacing: 0.5px;
+                        font-weight: 600;
+                        margin-bottom: 4px;
                     }
 
-                    .clickable-product-card:hover {
-                        transform: translateY(-6px);
-                        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.14);
+                    .product-name {
+                        font-size: 15px !important;
+                        font-weight: 600 !important;
+                        color: var(--text-dark) !important;
+                        margin-bottom: 16px !important;
+                        line-height: 1.5;
+                        min-height: 44px;
                     }
 
-                    .clickable-product-card:active {
-                        transform: translateY(-2px) scale(0.98);
-                        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+                    .product-price-row {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-end;
+                        margin-top: auto;
+                    }
+
+                    .product-price {
+                        color: var(--brand-blue);
+                        font-size: 20px;
+                        font-weight: 800;
+                    }
+
+                    .product-stock {
+                        font-size: 12px;
+                        color: var(--text-light);
                     }
                 `}
             </style>
 
             <Skeleton active loading={loading}>
                 {/* HERO */}
-                <Row
-                    gutter={[28, 28]}
-                    align="middle"
-                    style={{ marginBottom: 48 }}
-                >
-                    <Col xs={24} lg={13}>
-                        <div>
-                            <Tag
-                                color="blue"
-                                style={{
-                                    padding: '6px 14px',
-                                    borderRadius: 999,
-                                    marginBottom: 16
-                                }}
-                            >
-                                Laptop Store
-                            </Tag>
-
-                            <Title
-                                style={{
-                                    fontSize: 52,
-                                    lineHeight: 1.15,
-                                    marginBottom: 20
-                                }}
-                            >
-                                Laptop chính hãng
-                                <br />
-                                giá tốt mỗi ngày
+                <div className="hero-container">
+                    <Row gutter={[48, 48]} align="middle">
+                        <Col xs={24} lg={12}>
+                            <div className="hero-badge">
+                                Next Door Performance
+                            </div>
+                            <Title className="hero-title">
+                                Power your<br />potential.
                             </Title>
-
-                            <Paragraph
-                                style={{
-                                    color: '#4b5563',
-                                    maxWidth: 620,
-                                    fontSize: 17,
-                                    lineHeight: 1.8
-                                }}
-                            >
-                                Khám phá các dòng laptop gaming,
-                                văn phòng và đồ họa với nhiều ưu
-                                đãi hấp dẫn. Cập nhật sản phẩm mới
-                                và deal hot mỗi ngày.
-                            </Paragraph>
-
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    gap: 14,
-                                    flexWrap: 'wrap',
-                                    marginTop: 28
-                                }}
-                            >
-                                <Button
-                                    type="primary"
-                                    size="large"
-                                    icon={<ShoppingOutlined />}
-                                    style={{
-                                        height: 50,
-                                        borderRadius: 999,
-                                        paddingInline: 28,
-                                        fontWeight: 600
-                                    }}
-                                >
-                                    Mua ngay
-                                </Button>
-
-                                <Button
-                                    size="large"
-                                    style={{
-                                        height: 50,
-                                        borderRadius: 999,
-                                        paddingInline: 28
-                                    }}
-                                    onClick={() =>
-                                        window.scrollTo({
-                                            top: 500,
-                                            behavior: 'smooth'
-                                        })
-                                    }
-                                >
-                                    Khuyến mãi hot
-                                </Button>
+                            <div className="hero-desc">
+                                Discover the ultimate collection of premium laptops designed for creators, gamers, and professionals.
                             </div>
-                        </div>
-                    </Col>
-
-                    <Col xs={24} lg={11}>
-                        <Card
-                            style={{
-                                borderRadius: 24,
-                                overflow: 'hidden',
-                                boxShadow:
-                                    '0 12px 35px rgba(0,0,0,0.08)'
-                            }}
-                            bodyStyle={{
-                                padding: 0,
-                                height: 360
-                            }}
-                        >
-                            <Image
-                                preview={false}
-                                src="https://images.pexels.com/photos/3806757/pexels-photo-3806757.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                                alt="Shop hero"
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover'
-                                }}
-                            />
-                        </Card>
-                    </Col>
-                </Row>
-
-                {/* PROMOTIONS */}
-                <Divider orientation="left">
-                    🔥 Ưu đãi nổi bật
-                </Divider>
-
-                {promotions.length ? (
-                    <Carousel
-                        autoplay
-                        autoplaySpeed={5000}
-                        dots
-                        draggable
-                        className="custom-carousel"
-                        style={{
-                            marginBottom: 40
-                        }}
-                    >
-                        {promotions.map((promotion) => (
-                            <div key={promotion.id}>
-                                {renderPromotionCard(
-                                    promotion
-                                )}
+                            <Space size={16}>
+                                <Button type="primary" className="btn-primary" onClick={() => navigate('/products')}>
+                                    Shop Collection
+                                </Button>
+                                <Button className="btn-secondary" onClick={() => window.scrollTo({ top: document.getElementById('promo-section').offsetTop - 100, behavior: 'smooth' })}>
+                                    View Offers
+                                </Button>
+                            </Space>
+                        </Col>
+                        <Col xs={24} lg={12}>
+                            <div className="hero-image-wrapper">
+                                <Image
+                                    preview={false}
+                                    src="https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&q=80&w=1200"
+                                    alt="Hero Laptop"
+                                    className="hero-image"
+                                />
                             </div>
-                        ))}
-                    </Carousel>
-                ) : (
-                    <Row
-                        gutter={[24, 24]}
-                        style={{ marginBottom: 24 }}
-                    >
-                        <Col span={24}>
-                            <Empty description="Chưa có khuyến mãi" />
                         </Col>
                     </Row>
-                )}
+                </div>
 
-                {/* TOOLBAR: SEARCH & FILTER */}
-                <Row
-                    justify="space-between"
-                    align="middle"
-                    style={{ marginBottom: 24, marginTop: 40 }}
-                >
-                    <Col xs={24} md={12} style={{ marginBottom: 16 }}>
-                        <Title level={3} style={{ margin: 0 }}>
-                            Khám phá sản phẩm
-                        </Title>
-                    </Col>
-                    <Col xs={24} md={12}>
-                        <div
-                            style={{
-                                display: 'flex',
-                                gap: 16,
-                                flexWrap: 'wrap',
-                                justifyContent: 'flex-end'
-                            }}
-                        >
-                            <Search
-                                placeholder="Tìm kiếm sản phẩm..."
-                                allowClear
-                                onSearch={(value) => {
-                                    if(value) navigate(`/products?search=${value}`);
-                                }}
-                                style={{ width: 300 }}
-                            />
-                            <Button 
-                                type="primary" 
-                                size="large" 
-                                onClick={() => navigate('/products')}
-                            >
-                                Tất cả sản phẩm
-                            </Button>
-                        </div>
-                    </Col>
-                </Row>
+                {/* PROMOTIONS */}
+                <div id="promo-section" className="promo-section">
+                    <Title className="section-title" style={{ marginBottom: '24px' }}>
+                        <FireFilled className="section-icon" /> Special Offers
+                    </Title>
 
-                {/* BEST SELLING */}
-                <Divider orientation="left" id="bestselling-products-divider">
-                    Bán chạy nhất
-                </Divider>
-
-                <Skeleton active loading={productsLoading.bestSelling}>
-                    <Row gutter={[24, 24]}>
-                        {filteredBestSelling.length > 0 ? (
-                            filteredBestSelling.map((product) => (
-                                <Col
-                                    xs={24}
-                                    sm={12}
-                                    md={8}
-                                    lg={6}
-                                    key={`best-${product.id}`}
-                                >
-                                    {renderProductCard(product)}
-                                </Col>
-                            ))
-                        ) : (
-                            <Col span={24}>
-                                <Empty description="Không tìm thấy sản phẩm nào" />
-                            </Col>
-                        )}
-                    </Row>
-                    {bestSellingProducts.count > PRODUCT_PAGE_SIZE && (
-                        <Row justify="center" style={{ marginTop: 32 }}>
-                            <Pagination
-                                current={bestSellingPage}
-                                total={bestSellingProducts.count}
-                                pageSize={PRODUCT_PAGE_SIZE}
-                                onChange={handleBestSellingPageChange}
-                                showSizeChanger={false}
-                            />
-                        </Row>
+                    {promotions.length ? (
+                        <Carousel autoplay autoplaySpeed={6000} dots={{ className: 'minimal-dots' }}>
+                            {promotions.map((promotion) => (
+                                <div key={promotion.id}>
+                                    {renderPromotionCard(promotion)}
+                                </div>
+                            ))}
+                        </Carousel>
+                    ) : (
+                        <Empty description="No active promotions" />
                     )}
-                </Skeleton>
+                </div>
+
+                {/* TOOLBAR */}
+                <div className="toolbar-section">
+                    <Title className="section-title">
+                        Explore Collection
+                    </Title>
+                    <Space size={16} className="toolbar-right">
+                        <Search
+                            placeholder="Search laptops..."
+                            onSearch={(value) => { if(value) navigate(`/products?search=${value}`); }}
+                            className="toolbar-search"
+                            style={{ width: 260 }}
+                        />
+                        <Button className="btn-view-all" onClick={() => navigate('/products')}>
+                            View All
+                        </Button>
+                    </Space>
+                </div>
+
+                {/* TRENDING GRID */}
+                <div id="bestselling-section">
+                    <Skeleton active loading={productsLoading.bestSelling}>
+                        <Row gutter={[24, 32]}>
+                            {filteredBestSelling.length > 0 ? (
+                                filteredBestSelling.map((product) => (
+                                    <Col xs={24} sm={12} md={8} lg={6} key={`best-${product.id}`}>
+                                        {renderProductCard(product)}
+                                    </Col>
+                                ))
+                            ) : (
+                                <Col span={24}>
+                                    <Empty description="No products found" />
+                                </Col>
+                            )}
+                        </Row>
+                        {bestSellingProducts.count > PRODUCT_PAGE_SIZE && (
+                            <Row justify="center" style={{ marginTop: 48 }}>
+                                <Pagination
+                                    current={bestSellingPage}
+                                    total={bestSellingProducts.count}
+                                    pageSize={PRODUCT_PAGE_SIZE}
+                                    onChange={handleBestSellingPageChange}
+                                    showSizeChanger={false}
+                                    className="minimal-pagination"
+                                />
+                            </Row>
+                        )}
+                    </Skeleton>
+                </div>
             </Skeleton>
         </div>
     );
