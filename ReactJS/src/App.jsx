@@ -13,6 +13,7 @@ import Products from "./components/pages/products.jsx";
 import CartPage from "./components/pages/cart.jsx";
 import CheckoutPage from "./components/pages/checkout.jsx";
 import OrderHistoryPage from "./components/pages/orderHistory.jsx";
+import ProtectedRoute from "./components/routes/ProtectedRoute.jsx";
 
 import { Routes, Route, useLocation } from 'react-router-dom';
 
@@ -25,6 +26,7 @@ function App() {
     <>
       {showHeaderFooter && <Header />}
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
@@ -32,20 +34,22 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/products" element={<Products />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/checkout/:orderId" element={<CheckoutPage />} />
-        <Route path="/history" element={<OrderHistoryPage />} />
 
-        
-        
-        {/* User Routes */}
-        <Route path="/user/profile" element={<UserProfile />} />
-        <Route path="/user/edit-profile" element={<UserEditProfile />} />
+        {/* Protected Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout/:orderId" element={<CheckoutPage />} />
+          <Route path="/history" element={<OrderHistoryPage />} />
+          <Route path="/user/profile" element={<UserProfile />} />
+          <Route path="/user/edit-profile" element={<UserEditProfile />} />
+        </Route>
         
         {/* Admin Routes */}
-        <Route path="/admin/profile" element={<AdminProfile />} />
-        <Route path="/admin/edit-profile" element={<AdminEditProfile />} />
-        <Route path="/admin/edit-profile/:userId" element={<AdminEditProfile />} />
+        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+          <Route path="/admin/profile" element={<AdminProfile />} />
+          <Route path="/admin/edit-profile" element={<AdminEditProfile />} />
+          <Route path="/admin/edit-profile/:userId" element={<AdminEditProfile />} />
+        </Route>
       </Routes>
       {showHeaderFooter && <Footer />}
     </>

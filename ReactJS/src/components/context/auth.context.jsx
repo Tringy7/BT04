@@ -37,10 +37,7 @@ export const AuthWrapper = (props) => {
     useEffect(() => {
         const checkAuthOnLoad = async () => {
             try {
-                // The httpOnly cookie is sent automatically by the browser.
-                // We just need to call a protected endpoint to see if we get a valid user.
                 const res = await getUserProfileApi();
-                
                 if (res && res.user) {
                     dispatch({
                         type: 'LOGIN',
@@ -54,8 +51,6 @@ export const AuthWrapper = (props) => {
                     });
                 }
             } catch (error) {
-                // If the API call fails (e.g., 401 Unauthorized), it means no valid cookie.
-                // The axios interceptor might handle redirects, but we ensure the state is clean.
                 dispatch({ type: 'LOGOUT' });
             } finally {
                 setAppLoading(false);
@@ -63,6 +58,15 @@ export const AuthWrapper = (props) => {
         };
 
         checkAuthOnLoad();
+    }, []);
+
+    useEffect(() => {
+        const handleForceLogout = () => {
+            dispatch({ type: 'LOGOUT' });
+        };
+
+        window.addEventListener('force_logout', handleForceLogout);
+        return () => window.removeEventListener('force_logout', handleForceLogout);
     }, []);
 
     return (
